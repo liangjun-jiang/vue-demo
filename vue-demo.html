@@ -1,0 +1,122 @@
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/axios@0.12.0/dist/axios.min.js"></script>
+<script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
+<div id="app">
+   <h1>{{ title | capitalize}} </h1>
+   <h2>computed reverse "{{ reverse }}"</h2>
+  <span v-bind:title="message">
+    Hover your mouse for a while
+  </span>
+  <p v-if="seen">Now you see me</p>
+  <ol>
+    <li v-for="todo in todos">
+      {{ todo.text }}
+    </li>
+  </ol>
+  <button @click="reverseTitle">Reverse Title</button>
+  <p> {{ user_input }}</p>
+  <input v-model="user_input">
+  
+  <ol>
+    <todo-item
+      v-for="item in basket"
+      :todo="item"
+      :key="item.id">
+    </todo-item>
+  </ol>
+
+  <p>{{ fullname }}</p>
+
+  <p>
+    Ask a y/n question:
+    <input v-model="q">
+  </p>
+  <p>
+    {{ a }}
+  </p>
+</div>
+
+
+<script>
+  Vue.component('todo-item', {
+    props: ['todo'],
+    template: '<li>{{ todo.text }}</li>'
+  })
+
+  var vm = new Vue({
+    el: '#app',
+    data: {
+      title: 'vue.js is great!',
+      message: 'You loaded this page on ' + new Date(),
+      user_input: 'enter anything...',
+      seen: true,
+      todos: [
+        {text: 'Learn Javascript' },
+        {text: 'Learn Vue' },
+        {text: 'Build webpage easier' }
+      ],
+      basket: [
+        {id: 0, text: 'egg'},
+        {id: 0, text: 'juice'},
+        {id: 0, text: 'potato'}
+      ],
+      first_name: 'John',
+      last_name: 'Doe',
+      q: '',
+      a: 'I am waiting until you ask a question'
+    },
+    methods: {
+      reverseTitle: function () {
+        this.title = this.title.split('').reverse().join('')
+      },
+      getA: _.debounce(
+        function() {
+          if (this.q.indexOf('?') === -1) {
+            this.a = 'Questions usually contact a question mark.'
+            return
+          }
+          this.a = 'Thinking...'
+          var vm = this
+          axios.get('https://yesno.wtf/api')
+            .then(function (response) {
+              vm.a = _.capitalize(response.data.answer)
+            })
+            .catch(function (error) {
+              vm.a = 'Error! couldn\'t reach this api!'
+            })
+        },
+      500)
+    },
+    created: function () {
+      console.log('title is ' + this.title)
+    },
+    filters: {
+      capitalize: function (value) {
+        if (!value) return ''
+        value = value.toString()
+        return value.charAt(0).toUpperCase() + value.slice(1)
+      }
+    },
+    computed: {
+      reverse: function () {
+        return this.title.split('').reverse().join('')
+      },
+      fullname: {
+        get: function () {
+          return this.first_name + ' ' + this.last_name 
+        },
+        set: function (name) {
+          var n = name.split(' ')
+          this.first_name = n[0]
+          this.last_name = n[n.length - 1]
+        }
+      } 
+    },
+    watch: {
+      q: function(nQ){
+        this.a = 'I am waiting...'
+        this.getA()
+      }
+    }
+  })
+</script>
