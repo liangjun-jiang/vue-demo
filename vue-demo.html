@@ -137,9 +137,70 @@
     <simple-counter></simple-counter>
   </div>
 
+  <secret my-secret="what's up?"></secret>
+
+  <div>
+    <input v-model="parentMsg">
+    <br>
+    <secret :my-secret="parentMsg"></secret>
+  </div>
+
+  <div id="button-count">
+    <p> {{ total }} </p>
+    <button-count v-on:increment="incrementTotal"></button-count>
+    <button-count v-on:increment="incrementTotal"></button-count>
+  </div>
+
+  <currency-input v-model="price"></currency-input>
 </div>
 
 <script>
+  Vue.component('currency-input', {
+    template:`
+      <span>
+        $
+        <input
+          ref="input"
+          v-bind:value="value"
+          v-on:input="update($event.target.value)">
+      </span>
+    `,
+    props:['value'],
+    methods: {
+      update: function(value){
+        var formatted = value
+        .trim()
+        .slice(0, value.indexOf('.') === -1?value.length:value.indexOf('.') + 3)
+        if (formatted !== value) {
+          this.$refs.input.value = formatted
+        }
+        this.$emit('input', Number(formatted))
+      }
+    }
+  })
+
+
+  Vue.component('button-count',{
+    template:'<button @click="increment">{{ counter }} </button>',
+    data: function () {
+      return {
+        counter: 0
+      }
+    },
+    methods: {
+      increment: function () {
+        this.counter += 1,
+        this.$emit('increment')
+      }
+    }
+  })
+
+
+  Vue.component('secret',{
+    props:['mySecret'],
+    template:'<span>{{ mySecret }}</span>'
+  })
+
   Vue.component('simple-counter',{
     template: '<button @click="c +=1 ">{{ c }}</button>',
     data: function (){
@@ -213,7 +274,10 @@
         {id:0, text:'Egg'},
         {id:1, text:'Noodle'},
         {id:2, text:'Soup'}
-      ]
+      ],
+      parentMsg:'',
+      total: 0,
+      price: 0
     },
     methods: {
       reverseTitle: function () {
@@ -247,6 +311,9 @@
         alert("hello " + name + '!')
         if (event)
           alert(event.target.tagName)
+      },
+      incrementTotal: function () {
+        this.total += 1
       }
     },
     created: function () {
