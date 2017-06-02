@@ -19,8 +19,9 @@
   
   <ol>
     <todo-item
-      v-for="item in basket"
+      v-for="(item,index) in basket"
       :todo="item"
+      :index="index"
       :key="item.id">
     </todo-item>
   </ol>
@@ -52,19 +53,74 @@
 
   <template v-if="loginType === 'username'">
     <label>Username</label>
-    <input placeholder="Enter your username">
+    <input placeholder="Enter your username" key="username-input">
   </template>
   <template v-else>
     <label>Email</label>
-    <input placeholder="Enter your email address">
+    <input placeholder="Enter your email address" key="email-input">
   </template>
   <button @click="toggleLogin">Toggle Login Type</button>
+
+  <ul>
+    <li v-for="(item, index) of todos">
+      {{ index }} - {{ item.text }}
+    </li>
+  </ul>
+
+  <div v-for="(v,k) in bookObject">
+    <p>{{ k }} -- {{ v }} </p>
+  </div>
+
+  <div id="get-it-done-list">
+    <input
+      v-model="newItem"
+      v-on:keyup.enter="addNewItem"
+      placeholder="Add a new item"
+    >
+    <ul>
+      <li
+        is="get-it-done"
+        v-for="(item,index) in items"
+        v-bind:key="item"
+        v-bind:title="item"
+        v-on:remove="item.splice(index,1)"
+      ></li>
+    </ul>
+  </div>
+
+  <button @click="counter += 1">Add 1</button>
+  <p> the button has been clicked {{ counter }} times </p>
+
+  <li v-for="i of even">{{ i }}</li>
+
+  <p>
+    <button @click.once="greet('liangjun')">Greet</button>
+  </p>
+
+  <input v-model="content" placeholder="enter something">
+  <p>your content is : {{ content }} </p>
+  
+  <span> multiline message is : </span>
+  <p style="white-space: pre"> {{ essay }} </p>
+  <textarea v-model="essay" placeholder="add multiple lines"></textarea>
+
+
 </div>
 
 <script>
   Vue.component('todo-item', {
     props: ['todo'],
     template: '<li>{{ todo.text }}</li>'
+  })
+
+  Vue.component('get-it-done', {
+    props:['title'],
+    template: `
+      <li>
+         {{ title }}
+         <button @click="$emit('remove')">X</button>
+      </li>
+    `
   })
 
   var vm = new Vue({
@@ -74,6 +130,7 @@
       message: 'You loaded this page on ' + new Date(),
       user_input: 'enter anything...',
       seen: true,
+      counter: 0,
       todos: [
         {text: 'Learn Javascript' },
         {text: 'Learn Vue' },
@@ -96,7 +153,18 @@
         color: 'purple',
         fontSize: '20px'
       },
-      loginType: 'username'
+      loginType: 'username',
+      bookObject: {
+        title: 'from 0 to 1',
+        author: 'Elon Musk',
+        publisher: 'Unknown publisher'
+      },
+      newItem: '',
+      items: ['Play golf','Finish exams','Make some money'],
+      numbers: [1, 3, 5, 8, 9, 10, 11, 13, 15, 14, 2, 6],
+      appName: 'vue-demo',
+      content: '',
+      essay: ''
     },
     methods: {
       reverseTitle: function () {
@@ -121,6 +189,15 @@
       500),
       toggleLogin:function () {
         this.loginType = (this.loginType === 'username')?'email':'username'
+      },
+      addNewItem: function() {
+        this.items.push(this.newItem)
+        this.newItem = ''
+      },
+      greet:function (name, event) {
+        alert("hello " + name + '!')
+        if (event)
+          alert(event.target.tagName)
       }
     },
     created: function () {
@@ -146,7 +223,12 @@
           this.first_name = n[0]
           this.last_name = n[n.length - 1]
         }
-      } 
+      },
+      even:function (){
+        return this.numbers.filter(function(n){
+          return n % 2 !== 0
+        })
+      }
     },
     watch: {
       q: function(nQ){
