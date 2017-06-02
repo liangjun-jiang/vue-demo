@@ -34,8 +34,32 @@
   <p>
     {{ a }}
   </p>
-</div>
 
+  <div v-if="Math.random() > 0.5">
+    <div v-bind:style="styleObject0">
+      <p> this should show RED color</p>
+    </div>
+  </div>
+  <div v-else>
+    <div v-bind:style="styleObject1">
+      <p> this should show RED color</p>
+    </div>
+  </div>
+
+  <div v-bind:style="Math.random() > 0.5?styleObject0 : styleObject1 ">
+    <p> another way to show RED and purpler</p>
+  </div>
+
+  <template v-if="loginType === 'username'">
+    <label>Username</label>
+    <input placeholder="Enter your username">
+  </template>
+  <template v-else>
+    <label>Email</label>
+    <input placeholder="Enter your email address">
+  </template>
+  <button @click="toggleLogin">Toggle Login Type</button>
+</div>
 
 <script>
   Vue.component('todo-item', {
@@ -63,7 +87,16 @@
       first_name: 'John',
       last_name: 'Doe',
       q: '',
-      a: 'I am waiting until you ask a question'
+      a: 'I am waiting until you ask a question',
+      styleObject0: {
+        color: 'red',
+        fontSize: '13px'
+      },
+      styleObject1: {
+        color: 'purple',
+        fontSize: '20px'
+      },
+      loginType: 'username'
     },
     methods: {
       reverseTitle: function () {
@@ -85,7 +118,10 @@
               vm.a = 'Error! couldn\'t reach this api!'
             })
         },
-      500)
+      500),
+      toggleLogin:function () {
+        this.loginType = (this.loginType === 'username')?'email':'username'
+      }
     },
     created: function () {
       console.log('title is ' + this.title)
