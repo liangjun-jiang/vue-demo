@@ -103,11 +103,52 @@
   <span> multiline message is : </span>
   <p style="white-space: pre"> {{ essay }} </p>
   <textarea v-model="essay" placeholder="add multiple lines"></textarea>
+  
+  <br>
+  <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+  <label for="jack">Jack</label>
+  <input type="checkbox" id="john" value="John" v-model="checkedNames">
+  <label for="john">John</label>
+  <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+  <label for="mike">Mike</label>
+  <br>
+  <span>Checked names: {{ checkedNames.toString() }}</span>
 
+  <br>
+  <select v-model="options">
+  <option disabled value="">Please select one</option>
+  <option>A</option>
+  <option>B</option>
+  <option>C</option>
+  </select>
+  <span>Selected: {{ options }}</span>
+
+  <br>
+  <select v-model="multiOptions" multiple>
+    <option v-for="o in ops" :value="o.text">
+      {{ o.text }}
+    </option>
+  </select>
+  <span>Selected: {{ multiOptions }}</span>
+
+  <div id="counter">
+    <simple-counter></simple-counter>
+    <simple-counter></simple-counter>
+    <simple-counter></simple-counter>
+  </div>
 
 </div>
 
 <script>
+  Vue.component('simple-counter',{
+    template: '<button @click="c +=1 ">{{ c }}</button>',
+    data: function (){
+      return {
+        c : 0
+      }
+    }
+  })
+
   Vue.component('todo-item', {
     props: ['todo'],
     template: '<li>{{ todo.text }}</li>'
@@ -164,7 +205,15 @@
       numbers: [1, 3, 5, 8, 9, 10, 11, 13, 15, 14, 2, 6],
       appName: 'vue-demo',
       content: '',
-      essay: ''
+      essay: '',
+      checkedNames: [],
+      options:'',
+      multiOptions:[],
+      ops: [
+        {id:0, text:'Egg'},
+        {id:1, text:'Noodle'},
+        {id:2, text:'Soup'}
+      ]
     },
     methods: {
       reverseTitle: function () {
